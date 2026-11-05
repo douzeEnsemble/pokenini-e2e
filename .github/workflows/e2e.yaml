@@ -1,0 +1,66 @@
+name: E2E
+
+# Smoke tests Playwright contre les vrais sites (voir README.md)
+on:
+  # Envoyé par le CD de pi-projects après chaque déploiement, avec les versions déployées
+  repository_dispatch:
+    types: [deployed]
+  # Chaque nuit
+  schedule:
+    - cron: '0 5 * * *'
+  # Changement des tests : vérifie staging
+  pull_request: ~
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Site à tester
+        type: choice
+        options: [both, staging, prod]
+        default: both
+      admin:
+        description: Tester aussi l'administration sur la prod (toujours testée sur staging)
+        type: boolean
+        default: false
+
+jobs:
+  e2e:
+    name: E2E ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: e2e-${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(github.event_name == 'pull_request' && '["staging"]' || (github.event_name == 'workflow_dispatch' && inputs.target != 'both') && format('["{0}"]', inputs.target) || '["staging","prod"]') }}
+    env:
+      CI: true
+      E2E_TARGET: ${{ matrix.target }}
+      # After a deployment, waits for these versions and checks them on the admin page
+      E2E_EXPECTED_VERSIONS: ${{ github.event_name == 'repository_dispatch' && toJSON(github.event.client_payload.versions[matrix.target]) || '' }}
+      # Without them, only the visitor tests run
+      E2E_LOGIN_SECRET: ${{ secrets.E2E_LOGIN_SECRET }}
+      E2E_ADMIN_LOGIN_SECRET: ${{ secrets.E2E_ADMIN_LOGIN_SECRET }}
+      E2E_ADMIN: ${{ github.event_name == 'workflow_dispatch' && inputs.admin && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npx playwright test
+
+      - if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report-${{ matrix.target }}
+          path: |
+            playwright-report
+            test-results
+          retention-days: 14
