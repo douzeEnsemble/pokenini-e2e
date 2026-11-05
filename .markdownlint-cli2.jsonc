@@ -1,0 +1,8 @@
+{
+  "config": {
+    // Long lines are fine in prose and tables
+    "line-length": false,
+  },
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules/**", "playwright-report/**", "test-results/**"],
+}

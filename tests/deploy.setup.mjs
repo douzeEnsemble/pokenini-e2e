@@ -12,7 +12,7 @@ if (null !== target.expectedVersions) {
       const response = await request.get('/fr/hub');
       expect(response.status()).toBe(200);
       expect(versionOf(await response.text())).toBe(target.expectedVersions.web);
-    }).toPass({ intervals: [10_000, 30_000], timeout: 14 * 60_000 });
+    }).toPass({ intervals: [10_000, 30_000], timeout: target.deployTimeout });
   });
 } else {
   test(`${target.name} répond`, async ({ request }) => {

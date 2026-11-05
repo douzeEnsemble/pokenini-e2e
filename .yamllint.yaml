@@ -1,0 +1,15 @@
+extends: default
+
+ignore: |
+  node_modules/
+  playwright-report/
+  test-results/
+
+rules:
+  document-start: disable
+  # Prettier sets the line length, GitHub expressions can be long
+  line-length: disable
+  truthy:
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
