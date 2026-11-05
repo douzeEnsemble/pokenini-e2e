@@ -4,9 +4,34 @@
   "description": "Smoke tests Playwright contre staging et prod",
   "type": "module",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:unit": "node --test --experimental-test-coverage --test-coverage-include=targets.mjs --test-coverage-include=playwright.config.mjs --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 selftest/targets.test.mjs selftest/config.test.mjs",
+    "test:self": "node --test selftest/suite.test.mjs",
+    "lint": "npm run lint:eslint && npm run lint:prettier && npm run lint:types && npm run lint:markdown",
+    "lint:eslint": "eslint --max-warnings=0 .",
+    "lint:prettier": "prettier --check .",
+    "lint:types": "tsc -p .",
+    "lint:markdown": "markdownlint-cli2",
+    "fix": "eslint --fix . && prettier --write ."
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0"
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.20.5",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-playwright": "2.12.2",
+    "globals": "17.14.0",
+    "markdownlint-cli2": "0.24.0",
+    "prettier": "3.9.10",
+    "typescript": "7.0.2"
+  },
+  "overrides": {
+    "katex": "0.19.1",
+    "minimatch": "11.0.4",
+    "re2js": "2.8.7"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

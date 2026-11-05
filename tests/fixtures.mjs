@@ -10,9 +10,7 @@ export const target = getTarget();
 export const test = base.extend({
   context: async ({ context }, use) => {
     const { hostname } = new URL(target.baseURL);
-    await context.addCookies([
-      { name: 'tarteaucitron', value: '!matomocloud=false', domain: hostname, path: '/' },
-    ]);
+    await context.addCookies([{ name: 'tarteaucitron', value: '!matomocloud=false', domain: hostname, path: '/' }]);
     await context.route(/matomo\./, (route) => route.abort());
     await use(context);
   },
@@ -37,9 +35,13 @@ export { expect };
  * Checks that every image of the page that has been loaded displays (banners, Pokémon, types).
  */
 export async function expectLoadedImages(page) {
-  const broken = await page.locator('img').evaluateAll((images) => images
-    .filter((image) => image.complete && image.getAttribute('loading') !== 'lazy' && image.naturalWidth === 0)
-    .map((image) => image.currentSrc || image.src));
+  const broken = await page
+    .locator('img')
+    .evaluateAll((images) =>
+      images
+        .filter((image) => image.complete && image.getAttribute('loading') !== 'lazy' && image.naturalWidth === 0)
+        .map((image) => image.currentSrc || image.src),
+    );
 
   expect(broken, 'images cassées').toEqual([]);
 }

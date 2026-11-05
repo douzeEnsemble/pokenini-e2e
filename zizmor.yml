@@ -1,0 +1,7 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # GitHub's own actions follow their major tags, like in the other Pokénini repos
+        actions/*: ref-pin
+        '*': hash-pin
