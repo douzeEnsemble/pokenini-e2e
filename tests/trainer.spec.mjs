@@ -23,9 +23,13 @@ test.describe(`${target.name} : dresseur de test`, () => {
     await expect(page.locator('#home .dex-item').or(page.locator('#home .alert')).first()).toBeVisible();
     await expectLoadedImages(page);
 
-    // The trainer space lists every dex of the trainer, each with a link to its album
+    // The trainer space lists every dex of the trainer, each with a link to its album.
+    // Unreleased dex answer 404 to a trainer, premium and custom ones may be empty: take a plain one.
     await page.goto('/fr/trainer');
-    const album = page.locator('.trainer-dex-item a[href*="/fr/album/"]').first();
+    const album = page
+      .locator('.trainer-dex-item:not(:has(.dex_not_is_released, .dex_is_premium, .dex_is_custom))')
+      .locator('a[href*="/fr/album/"]')
+      .first();
     await expect(album).toBeVisible();
     await expectLoadedImages(page);
 
