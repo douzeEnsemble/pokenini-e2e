@@ -37,6 +37,9 @@ export const BREAKS = [
   'open-trainer',
 ];
 
+// Like the real menu, which links to the games: a page may have several links to a game
+const NAV_GAMES = '<a href="/fr/game/color">Bonne Palette</a><a href="/fr/game/shiny">Chroma ou pas</a>';
+
 const GAME_ID = '123e4567-e89b-12d3-a456-426614174000';
 const GAMES = {
   color: { choices: 'color-choices', roundCounts: true },
@@ -80,7 +83,7 @@ export function startMockSite({ breaks = [] } = {}) {
 
   const page = (body, { session, webVersion = VERSIONS.web, extra = '' }) => `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><title>Pokénini</title></head><body>
-<nav>${session ? '<a href="/fr/connect/logout">Déconnexion</a>' : '<a href="/fr/connect">Connexion</a>'}</nav>
+<nav>${session ? `<a href="/fr/connect/logout">Déconnexion</a>${NAV_GAMES}` : '<a href="/fr/connect">Connexion</a>'}</nav>
 <main>${body}</main>
 <footer><p id="copyright" title="Version ${webVersion}">©</p></footer>
 ${extra}<script>${SCRIPT}</script>
@@ -166,15 +169,21 @@ ${extra}<script>${SCRIPT}</script>
     }
 
     if ('/fr/trainer' === path) {
-      return html('<div id="trainer-sidebar">Dresseur</div>');
+      return html(`<div id="trainer-sidebar">Dresseur</div>
+<div class="trainer-dex-item" id="trainer-dex-home"><img src="/img/banner.png" alt="">
+<a class="btn" href="/fr/album/home">Voir</a></div>`);
     }
-    if ('/fr/album/dex' === path || '/fr/election/dex' === path) {
-      return html('<div class="dex-item"><a href="/fr/album/home"><img src="/img/banner.png" alt="">Home</a></div>');
+    if ('/fr/album/dex' === path) {
+      // Like the test trainer: no dex shown on the home page
+      return html('<div id="home"><h1>Albums</h1><div class="alert" role="alert">Aucun dex</div></div>');
+    }
+    if ('/fr/election/dex' === path) {
+      return html('<div class="dex-item"><a href="/fr/election/home"><img src="/img/banner.png" alt="">Home</a></div>');
     }
     if ('/fr/game' === path) {
       return html(
         Object.keys(GAMES)
-          .map((game) => `<a href="/fr/game/${game}">${game}</a>`)
+          .map((game) => `<div class="dex-item game-item"><a href="/fr/game/${game}">${game}</a></div>`)
           .join(''),
       );
     }
