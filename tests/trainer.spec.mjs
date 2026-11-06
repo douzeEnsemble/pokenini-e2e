@@ -19,11 +19,17 @@ test.describe(`${target.name} : dresseur de test`, () => {
 
   test('la liste des dex et un album', async ({ page }) => {
     await page.goto('/fr/album/dex');
-    const dex = page.locator('.dex-item a');
-    await expect(dex.first()).toBeVisible();
+    // Only the dex shown on the home page are listed: the test trainer may have none
+    await expect(page.locator('#home .dex-item').or(page.locator('#home .alert')).first()).toBeVisible();
     await expectLoadedImages(page);
 
-    await dex.first().click();
+    // The trainer space lists every dex of the trainer, each with a link to its album
+    await page.goto('/fr/trainer');
+    const album = page.locator('.trainer-dex-item a[href*="/fr/album/"]').first();
+    await expect(album).toBeVisible();
+    await expectLoadedImages(page);
+
+    await album.click();
     await expect(page).toHaveURL(/\/fr\/album\/[a-z0-9-]+/);
     await expect(page.locator('.album-case-name').first()).toBeVisible();
     await expectLoadedImages(page);
@@ -37,7 +43,8 @@ test.describe(`${target.name} : dresseur de test`, () => {
   test('les trois jeux listent leurs dex', async ({ page }) => {
     await page.goto('/fr/game');
     for (const path of ['/fr/game/color', '/fr/game/shiny', '/fr/game/which-shiny']) {
-      await expect(page.locator(`a[href$="${path}"]`), path).toBeVisible();
+      // The menu links to the games too, only check the cards of the page
+      await expect(page.locator(`.game-item a[href$="${path}"]`), path).toBeVisible();
       const response = await page.goto(path);
       expect(response?.status(), path).toBe(200);
       await expect(page.locator('.new-game, .resume-game').first(), path).toBeVisible();
