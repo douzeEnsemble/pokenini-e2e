@@ -169,7 +169,10 @@ ${extra}<script>${SCRIPT}</script>
     }
 
     if ('/fr/trainer' === path) {
+      // Like the real trainer space, an unreleased dex may come first: its album answers 404
       return html(`<div id="trainer-sidebar">Dresseur</div>
+<div class="trainer-dex-item" id="trainer-dex-locked"><span class="dex_not_is_released">🔒</span>
+<a class="btn" href="/fr/album/locked">Voir</a></div>
 <div class="trainer-dex-item" id="trainer-dex-home"><img src="/img/banner.png" alt="">
 <a class="btn" href="/fr/album/home">Voir</a></div>`);
     }
