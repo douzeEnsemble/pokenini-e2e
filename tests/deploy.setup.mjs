@@ -3,7 +3,7 @@ import { getTarget } from '../targets.mjs';
 
 const target = getTarget();
 
-const versionOf = (html) => html.match(/title="Version ([^"]+)"/)?.[1] ?? 'inconnue';
+const versionOf = (html) => html.match(/title="Version ([^"]+)"/)?.[1]?.trim() ?? 'inconnue';
 
 if (null !== target.expectedVersions) {
   test(`${target.name} sert la version web ${target.expectedVersions.web}`, async ({ request }) => {
